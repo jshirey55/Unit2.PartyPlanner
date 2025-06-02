@@ -19,7 +19,8 @@ const fetchAllEvents = async () => {
   }
 }
 
-const createNewEvent = async (name, location, description, date) => {
+const createNewEvent = async (name, description, location, date) => {
+ const formattedDate = new Date(date).toISOString();
   try {
     await fetch(API_URL, {
       method: "POST",
@@ -27,7 +28,7 @@ const createNewEvent = async (name, location, description, date) => {
           name,
           location,
           description,
-          date
+          date: formattedDate
       }),
       headers: {
           "Content-Type": "application/json",
@@ -35,12 +36,12 @@ const createNewEvent = async (name, location, description, date) => {
     })
 
 
-    fetchAllEvents()
+    fetchAllEvents();
 
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
  const removeEvent = async (id) => {
       try {
@@ -48,12 +49,12 @@ const createNewEvent = async (name, location, description, date) => {
           method: "DELETE"
         })
 
-    fetchAllEvents()
+    fetchAllEvents();
 
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    }
+    };
 
 const renderAllEvents = () => {
   const eventsContainer = document.getElementById("events-container")
@@ -73,14 +74,15 @@ const renderAllEvents = () => {
             <h4>${event.name}</h4>
             <p>${event.location}</p>
             <p>${event.description}</p>
+            <p>${event.date}</p>
             <button class="delete-button" data-id="${event.id}">Remove</button>
         `
       eventsContainer.appendChild(eventElement)
 
-      const deletebutton = eventElement.querySelector(".delete-button")
-      deletebutton.addEventListener("click", (event) => {
+      const deleteButton = eventElement.querySelector(".delete-button")
+      deleteButton.addEventListener("click", (e) => {
         try {
-          event.preventDefault()
+          e.preventDefault()
           removeEvent(event.id)
         } catch (error) {
           console.log(error)
@@ -92,8 +94,15 @@ const renderAllEvents = () => {
 const addListenerToForm = () => {
   const form = document.querySelector("#new-event-form")
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault()
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault()
+
+    console.log("Form Values:", {
+  name: form.name.value,
+  location: form.location.value,
+  description: form.description.value,
+  date: form.date.value,
+});
 
     await createNewEvent(
       form.name.value,
@@ -102,16 +111,16 @@ const addListenerToForm = () => {
       form.date.value
     )
 
-    form.name.value = ""
-    form.location.value = ""
-    form.description.value = ""
-    form.date.value = ""
-  })
-}
+    form.name.value = "";
+    form.location.value = "";
+    form.description.value = "";
+    form.date.value = "";
+  });
+};
 
 const init = async () => {
   await fetchAllEvents()
   addListenerToForm()
 }
 
-init()
+init();
